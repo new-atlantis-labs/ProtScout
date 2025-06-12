@@ -46,13 +46,13 @@ ENV ENV_NAME="diffdock"
 ENV DIR_NAME="DiffDock"
 
 # Copy the Conda environment and application code from the builder stage
-COPY --from=builder --chown=$APPUSER:$APPUSER $HOME/micromamba $HOME/micromamba
 COPY --from=builder --chown=$APPUSER:$APPUSER $HOME/bin $HOME/bin
+COPY --from=builder --chown=$APPUSER:$APPUSER $HOME/.local $HOME/.local
 COPY --from=builder --chown=$APPUSER:$APPUSER $HOME/$DIR_NAME $HOME/$DIR_NAME
 WORKDIR $HOME/$DIR_NAME
 
 # Set the environment variables
-ENV MAMBA_ROOT_PREFIX=$HOME/micromamba
+ENV MAMBA_ROOT_PREFIX=$HOME/.local/share/mamba
 ENV PATH=$HOME/bin:$HOME/.local/bin:$PATH
 RUN micromamba shell init -s bash --root-prefix $MAMBA_ROOT_PREFIX
 

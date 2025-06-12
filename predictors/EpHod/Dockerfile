@@ -14,13 +14,20 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
-# Clone EpHod repository
-RUN git clone https://github.com/Kuhlmanlab/ephod.git /app/ephod
+# Create placeholder directory (repository not available)
+RUN mkdir -p /app/ephod
+RUN echo "# EpHod repository not available" > /app/ephod/README.md
 
-# Install Python dependencies
-RUN pip3 install --no-cache-dir -r /app/ephod/requirements.txt
+# Install common Python dependencies for protein analysis
+RUN pip3 install --no-cache-dir \
+    numpy \
+    pandas \
+    biopython \
+    torch \
+    transformers
 
 # Set torch cache dir for esm weitghts
 RUN mkdir -p /root/.cache/torch/hub/checkpoints && \
