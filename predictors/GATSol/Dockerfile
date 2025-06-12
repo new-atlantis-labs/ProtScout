@@ -14,16 +14,19 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the local repository contents
-COPY . /app/
+# Clone GATSol repository
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+RUN git clone https://github.com/ningyu-wang/GATSol.git /app/GATSol
 
 # Install Python dependencies
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r /app/GATSol/requirements.txt
 
 # Set torch cache dir for esm weitghts
 RUN mkdir -p /root/.cache/torch/hub/checkpoints && \
     chmod -R 777 /root/.cache
 
+# Set working directory to GATSol
+WORKDIR /app/GATSol
+
 # Default command to run predictions
-ENTRYPOINT ["python", "entrypoint.py"]
+CMD ["python", "-c", "print('GATSol container ready. Use: docker run -v /path/to/data:/input -v /path/to/output:/output protscout:gatsol python predict.py')"]

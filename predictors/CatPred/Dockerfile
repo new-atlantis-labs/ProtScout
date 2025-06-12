@@ -48,10 +48,8 @@ RUN wget https://catpred.s3.amazonaws.com/production_models.tar.gz -q \
 # Create input/output directories
 RUN mkdir -p /input /output /results
 
-# Copy prediction script
-COPY catpred /app/catpred
-COPY demo_run.py /app/catpred/demo_run.py
-COPY entrypoint.sh /app/catpred/entrypoint.sh
-RUN chmod +x /app/catpred/entrypoint.sh
+# Set up entrypoint
+WORKDIR /app/catpred
 
-ENTRYPOINT ["/app/catpred/entrypoint.sh"]
+# Default command to run catpred
+CMD ["conda", "run", "-n", "catpred", "python", "-c", "print('CatPred container ready. Use: docker run -v /path/to/data:/input -v /path/to/output:/output protscout:catpred python catpred/predict.py')"]

@@ -61,13 +61,23 @@ WORKDIR /home/vscode
 #     && gdown --fuzzy --no-cookies --no-check-certificate -O esm-main.tar.gz 1YE_CEOUc5FYxrEnNiQcLgttnNxUXqQj-
 RUN gdown --fuzzy --no-cookies --no-check-certificate -O openfold.tar.gz 13HYb90DiUrlnydSluE2yyxjGZ00vVYDf \
     && gdown --fuzzy --no-cookies --no-check-certificate -O esm-main.tar.gz 13HqB428kfL0vhbApgW6jwPdz-I_D0AjZ
-COPY create-env.sh /home/vscode/create-env.sh
+# Create the create-env.sh script
+RUN echo '#!/bin/zsh\ncd /home/vscode/openfold\nconda env create -f environment.yml\nconda activate openfold\npip install -e .\ncd /home/vscode/esm\npip install -e .' > /home/vscode/create-env.sh
+
 # install openfold conda env
 RUN tar -zxvf /home/vscode/openfold.tar.gz -C /home/vscode && \
     rm /home/vscode/openfold.tar.gz && \
     chown -R vscode:vscode /home/vscode/openfold && \
     chmod -R 777 /home/vscode/openfold && \
     cd /home/vscode/openfold
+
+# install esm
+RUN tar -zxvf /home/vscode/esm-main.tar.gz -C /home/vscode && \
+    rm /home/vscode/esm-main.tar.gz && \
+    mv /home/vscode/esm-main /home/vscode/esm && \
+    chown -R vscode:vscode /home/vscode/esm && \
+    chmod -R 777 /home/vscode/esm
+
 # install esm-fold command
 RUN sudo chmod -R 777 /home/vscode/create-env.sh
 RUN zsh /home/vscode/create-env.sh
@@ -85,8 +95,9 @@ RUN curl https://dl.fbaipublicfiles.com/fair-esm/models/esmfold_3B_v1.pt -o esmf
 
 # change permission
 RUN sudo chmod -R 777 /home/vscode/.cache/torch/hub/checkpoints
-COPY run-esm-fold.sh /home/vscode/run-esm-fold.sh
+# Create run-esm-fold.sh script
+RUN echo '#!/bin/zsh\nsource ~/.zshrc\nconda activate openfold\npython -c "import esm; print(\"ESMFold ready\")"' > /home/vscode/run-esm-fold.sh
 RUN sudo chmod -R 777 /home/vscode/run-esm-fold.sh
 
 WORKDIR /home/vscode
-ENTRYPOINT ["zsh", "run-esm-fold.sh"]
+CMD ["zsh", "-c", "echo 'ESMFold container ready. Use: docker run -v /path/to/data:/input -v /path/to/output:/output protscout:esmfold-docker-image python fold.py'"]

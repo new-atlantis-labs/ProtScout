@@ -16,14 +16,11 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first to leverage Docker cache
-COPY requirements.txt .
+# Clone EpHod repository
+RUN git clone https://github.com/Kuhlmanlab/ephod.git /app/ephod
 
 # Install Python dependencies
-RUN pip3 install --no-cache-dir -r requirements.txt
-
-# Copy the repository contents to working directory
-COPY ephod /app/ephod
+RUN pip3 install --no-cache-dir -r /app/ephod/requirements.txt
 
 # Set torch cache dir for esm weitghts
 RUN mkdir -p /root/.cache/torch/hub/checkpoints && \

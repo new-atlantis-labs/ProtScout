@@ -11,24 +11,20 @@ WORKDIR /app
 RUN apt update && apt install -y \
     python3 \
     python3-pip \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements file
-COPY temBERTure/requirements.txt .
+# Clone TemBERTure repository
+RUN git clone https://github.com/Protein-sequence-embeddings/temBERTure.git /app/temBERTure
 
 # Install Python dependencies
-RUN pip3 install --no-cache-dir -r requirements.txt
-
-# Copy the TemBERTure code and models
-COPY temBERTure/temBERTure.py .
-COPY temBERTure/temBERTure_CLS ./temBERTure_CLS
-COPY temBERTure/temBERTure_TM ./temBERTure_TM
-
-# Copy entrypoint script
-COPY entrypoint.py .
+RUN pip3 install --no-cache-dir -r /app/temBERTure/requirements.txt
 
 # Set environment variables
 ENV PYTHONPATH=/app
 
+# Set working directory to TemBERTure
+WORKDIR /app/temBERTure
+
 # Set the entrypoint
-ENTRYPOINT ["python3", "/app/entrypoint.py"]
+CMD ["python3", "-c", "print('TemBERTure container ready. Use: docker run -v /path/to/data:/input -v /path/to/output:/output protscout:temberture python temBERTure.py')"]

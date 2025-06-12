@@ -71,9 +71,9 @@ RUN pip install --no-cache-dir \
     'dllogger @ git+https://github.com/NVIDIA/dllogger.git'
 
 # ------------------------------------------------------------------------------
-# 7) Copy your code, install OpenFold, etc.
+# 7) Clone GeoPoc repository and install OpenFold, etc.
 # ------------------------------------------------------------------------------
-COPY GeoPoc /app/GeoPoc
+RUN git clone https://github.com/kuratahiroyuki/GeoPoc.git /app/GeoPoc
 
 WORKDIR /app/GeoPoc/openfold
 RUN python setup.py install
