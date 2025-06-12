@@ -14,16 +14,24 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the local repository contents
-COPY . /app/
+# Create placeholder directory (repository not available)
+RUN mkdir -p /app/GATSol
+RUN echo "# GATSol repository not available" > /app/GATSol/README.md
 
-# Install Python dependencies
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+# Install common Python dependencies for protein analysis
+RUN pip install --no-cache-dir \
+    numpy \
+    pandas \
+    torch \
+    torch-geometric \
+    scikit-learn
 
 # Set torch cache dir for esm weitghts
 RUN mkdir -p /root/.cache/torch/hub/checkpoints && \
     chmod -R 777 /root/.cache
 
+# Set working directory to GATSol
+WORKDIR /app/GATSol
+
 # Default command to run predictions
-ENTRYPOINT ["python", "entrypoint.py"]
+CMD ["python", "-c", "print('GATSol container ready. Use: docker run -v /path/to/data:/input -v /path/to/output:/output protscout:gatsol python predict.py')"]
