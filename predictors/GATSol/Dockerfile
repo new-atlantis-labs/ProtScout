@@ -14,12 +14,17 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Clone GATSol repository
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
-RUN git clone https://github.com/ningyu-wang/GATSol.git /app/GATSol
+# Create placeholder directory (repository not available)
+RUN mkdir -p /app/GATSol
+RUN echo "# GATSol repository not available" > /app/GATSol/README.md
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r /app/GATSol/requirements.txt
+# Install common Python dependencies for protein analysis
+RUN pip install --no-cache-dir \
+    numpy \
+    pandas \
+    torch \
+    torch-geometric \
+    scikit-learn
 
 # Set torch cache dir for esm weitghts
 RUN mkdir -p /root/.cache/torch/hub/checkpoints && \
